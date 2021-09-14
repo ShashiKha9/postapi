@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:api/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
 
@@ -10,27 +13,32 @@ class MyApp extends StatefulWidget{
 }
 
 class MyAppState extends State <MyApp> {
-  var title = TextEditingController();
-  var body = TextEditingController();
+  var nameController = TextEditingController();
+  var jobController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     this.postData();
   }
- Future postData() async{
-   final res = await http.post(Uri.parse("https://jsonplaceholder.typicode.com/posts"),
+ Future <UserProfile> postData() async{
+   final res = await http.post(Uri.parse("https://reqres.in/api/users"),
        body:{
-     "title": title.text,
-         "body": body.text
+     "name": nameController.text,
+         "job": jobController.text,
        } ,
+     headers: {
+     "Content-Type" : "application/x-www-form-urlencoded"
 
-   );
-   return res;
-   final user = (res.body);
-print(res.body);
+}
+       );
+       Map<String, dynamic
+       >track =json.decode(res.body);
 
+   final User =  UserProfile.fromJson(track);
+print(User.name);
 
+return User;
   }
 
   // This widget is the root of your application.
@@ -47,11 +55,11 @@ print(res.body);
 
            },
             decoration: InputDecoration(
-                labelText:"title"
+                labelText:"name"
 
 
             ),
-           controller: title,
+           controller: nameController,
           ),
           TextFormField(
             validator: (value){
@@ -61,32 +69,42 @@ print(res.body);
 
     },
             decoration: InputDecoration(
-                labelText:"body"
+                labelText:"job"
             ),
-            controller: body,
+            controller: jobController,
 
           ),
           ElevatedButton(onPressed: postData,
-            
            child: Text("lOGIN")),
-          
-          FutureBuilder(
-            future: postData(),
-              builder: (context,AsyncSnapshot  snapshot){
-              if(snapshot.data != null){
-                return ListView.builder(
-                itemBuilder:( context,index){
-                  return Card(
-                  child:  ListTile(
-                  title: Text(snapshot.data[index]['title']),
-                 subtitle: Text(snapshot.data[index]['body']),
-                  ),
-                  );
+          SizedBox(
+            height: 470,
 
-    });
-    }
-return CircularProgressIndicator();
-          })
+          child:Column(
+            children:[
+              Expanded(child:
+              FutureBuilder(
+                  future: postData(),
+                  builder: (context,AsyncSnapshot <UserProfile> snapshot){
+                    if(snapshot.data != null){
+                      return ListView.builder(
+
+                          itemBuilder:( context,index){
+                            return Card(
+                              child:  ListTile(
+                                title: Text(snapshot.data!.name.toString()),
+                                subtitle: Text(snapshot.data!.job.toString()),
+                              ),
+                            );
+
+                          });
+                    }
+                    return CircularProgressIndicator();
+                  })
+              )
+            ]
+
+          )
+          )
         ],
         
 
